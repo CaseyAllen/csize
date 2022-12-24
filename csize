@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+
+from re import sub
+import subprocess
+import sys
+
+def err(msg):
+    print(msg)
+    exit(1)
+
+
+if len(sys.argv) < 2: err("csize expects at least one argument")
+
+DEFAULT_HEADERS = [
+    "stdio.h",
+    "ctype.h",
+    "time.h",
+    "math.h",
+    "stdlib.h",
+    "sys/stat.h"
+]
+
+typ = sys.argv[1]
+
+headers = DEFAULT_HEADERS+ (sys.argv[2:] if len(sys.argv) > 2 else [] )
+
+
+SRC = "\n".join( [ f"#include <{h}>" for h in headers ] ) + "\n\n"
+SRC += f"int main(){{ printf(\"%lu\", sizeof({typ}));return 0;}}"
+
+
+code = subprocess.Popen(("echo", SRC), stdout=subprocess.PIPE)
+clang = subprocess.Popen(("clang", "-S", "-emit-llvm", "-xc", "-", "-o-"), stdin=code.stdout, stdout=subprocess.PIPE)
+lli = subprocess.Popen(("lli"), stdin=clang.stdout)
+
+
+
+
