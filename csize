@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-
-from re import sub
 import subprocess
 import sys
 
